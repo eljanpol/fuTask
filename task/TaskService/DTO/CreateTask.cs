@@ -4,5 +4,5 @@ namespace TaskService.DTO;
 public record CreateTask
 (
     [Required]string Title,
-    string Description
+    string Description = ""
 );

@@ -14,6 +14,5 @@ public class TaskItem
 
     public TaskStatus Status {get;set;} = TaskStatus.New;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    // public Guid UserId{get;set;}
-    // public User? User{get;set;}
+
 }

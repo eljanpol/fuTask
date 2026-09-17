@@ -62,7 +62,10 @@ app.UseSwaggerUI();
 app.MapGet("/api/task/", async(AppDbContext db) => await db.Tasks.ToArrayAsync());
 app.MapPost("/api/task/", async (CreateTask createTask, AppDbContext db, IHttpClientFactory httpFactory, JsonSerializerOptions jsonOptions) =>
 {
-    // var UserId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+    if (createTask.Title is null)
+    {
+        return Results.BadRequest("Title is null");
+    } 
     var NewTask = new TaskItem { Id = Guid.NewGuid(), CreatedAt = DateTime.UtcNow, Title = createTask.Title, Description = createTask.Description, Status = TaskService.Models.TaskStatus.New };
     db.Tasks.Add(NewTask);
     await db.SaveChangesAsync();
@@ -88,46 +91,5 @@ app.MapDelete("/api/task/{id}", async (Guid id, AppDbContext db) =>
     return Results.NoContent();
 });
 
-
-// app.MapGet("/api/user/",async(AppDbContext db) => await db.Users.ToArrayAsync());
-
-// app.MapGet("/api/user/{id}",async (Guid id, AppDbContext db) =>
-// {
-//     var user = await db.Users.FindAsync(id);
-//     if (user is null)
-//     {
-//         return Results.NotFound();
-//     }
-//     return Results.Ok(user);
-// });
-
-// app.MapPost("/api/auth/register/", async (CreateUser user,AppDbContext db) =>
-// {
-//     var UserExists = await db.Users.FirstOrDefaultAsync(u => u.Name == user.Name);
-//     if (UserExists is not null)
-//     {
-//         return Results.Conflict("User already exists");
-//     }
-//     var NewUser = new User(Guid.NewGuid(),user.Name);
-//     NewUser.PasswordHash = PasswordHashVer.Hash(user.Password,NewUser);
-//     db.Users.Add(NewUser);
-//     await db.SaveChangesAsync();
-//     return Results.Created($"/api/user/{NewUser.Id}",new {NewUser.Id,NewUser.Name} );
-// });
-
-// app.MapPost("/api/auth/login/", async (LoginUser user,AppDbContext db) =>
-// {
-//     var foundUser = await db.Users.FirstOrDefaultAsync(u => u.Name == user.Name);
-//     if (foundUser is null)
-//     {
-//         return Results.Unauthorized();
-//     }
-//     if(!PasswordHashVer.Verify(user.Password, foundUser.PasswordHash, foundUser))
-//     {
-//         return Results.Unauthorized();
-//     }
-//     var token = JWT.GenerateToken(foundUser,builder.Configuration);
-//     return Results.Ok(new{token});
-// });
 
 app.Run();
